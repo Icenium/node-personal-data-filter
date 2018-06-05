@@ -1,5 +1,6 @@
 "use strict";
 
+const crypto = require("crypto");
 const assert = require("chai").assert;
 const pdf = require("../index");
 
@@ -87,28 +88,43 @@ describe("PersonalDataFilter", () => {
 		});
 
 		describe("strings", () => {
-			const testCaces = [
-				{ msg: email, expected: expectedMaskedOutput },
-				{ msg: `text ${email} text`, expected: `text ${expectedMaskedOutput} text` },
-				{ msg: `text ${email} ${email} text`, expected: `text ${expectedMaskedOutput} ${expectedMaskedOutput} text` },
-				{ msg: guid, expected: expectedMaskedOutput },
-				{ msg: "487818704899480c907e2c0549664116", expected: "487818704899480c907e2c0549664116" },
-				{ msg: `text ${guid} text`, expected: `text ${expectedMaskedOutput} text` },
-				{ msg: `${guid}${guid}`, expected: `${expectedMaskedOutput}${expectedMaskedOutput}` },
-				{ msg: `text${guid}text${guid}text`, expected: `text${expectedMaskedOutput}text${expectedMaskedOutput}text` },
-				{ msg: `text${guid}${guid}text`, expected: `text${expectedMaskedOutput}${expectedMaskedOutput}text` },
-				{ msg: `${email}${guid}`, expected: `${expectedMaskedOutput}${expectedMaskedOutput}` },
-				{ msg: `${email} ${guid} ${email}`, expected: `${expectedMaskedOutput} ${expectedMaskedOutput} ${expectedMaskedOutput}` },
-				{ msg: ipV4, expected: expectedMaskedOutput },
-				{ msg: `text${ipV4}text`, expected: `text${expectedMaskedOutput}text` },
-				{ msg: ipV6, expected: expectedMaskedOutput },
-				{ msg: `text${ipV6}text`, expected: `text${expectedMaskedOutput}text` }
-			];
+			const hashMatchReplacer = (match) => crypto.createHash("sha256").update(match).digest("hex");
+			const tests = [{
+				title: "filter with default match replacer",
+				expectedTextTransformer: hashMatchReplacer,
+				filter: pdf.newFilter({ useDefaultMatchReplacer: true })
+			}, {
+				title: "filter with mask",
+				expectedTextTransformer: () => expectedMaskedOutput,
+				filter: personalDataFilter
+			}];
 
-			testCaces.forEach(t => {
-				it(`should transform "${t.msg}" to "${t.expected}"`, () => {
-					const result = personalDataFilter.filter(t.msg);
-					assert.deepEqual(result, t.expected);
+			tests.forEach(test => {
+				describe(test.title, () => {
+					const testCaces = [
+						{ msg: email, expected: test.expectedTextTransformer(email) },
+						{ msg: `text ${email} text`, expected: `text ${test.expectedTextTransformer(email)} text` },
+						{ msg: `text ${email} ${email} text`, expected: `text ${test.expectedTextTransformer(email)} ${test.expectedTextTransformer(email)} text` },
+						{ msg: guid, expected: test.expectedTextTransformer(guid) },
+						{ msg: "487818704899480c907e2c0549664116", expected: "487818704899480c907e2c0549664116" },
+						{ msg: `text ${guid} text`, expected: `text ${test.expectedTextTransformer(guid)} text` },
+						{ msg: `${guid}${guid}`, expected: `${test.expectedTextTransformer(guid)}${test.expectedTextTransformer(guid)}` },
+						{ msg: `text${guid}text${guid}text`, expected: `text${test.expectedTextTransformer(guid)}text${test.expectedTextTransformer(guid)}text` },
+						{ msg: `text${guid}${guid}text`, expected: `text${test.expectedTextTransformer(guid)}${test.expectedTextTransformer(guid)}text` },
+						{ msg: `${email}${guid}`, expected: `${test.expectedTextTransformer(email)}${test.expectedTextTransformer(guid)}` },
+						{ msg: `${email} ${guid} ${email}`, expected: `${test.expectedTextTransformer(email)} ${test.expectedTextTransformer(guid)} ${test.expectedTextTransformer(email)}` },
+						{ msg: ipV4, expected: test.expectedTextTransformer(ipV4) },
+						{ msg: `text${ipV4}text`, expected: `text${test.expectedTextTransformer(ipV4)}text` },
+						{ msg: ipV6, expected: test.expectedTextTransformer(ipV6) },
+						{ msg: `text${ipV6}text`, expected: `text${test.expectedTextTransformer(ipV6)}text` }
+					];
+
+					testCaces.forEach(t => {
+						it(`should transform "${t.msg}" to "${t.expected}"`, () => {
+							const result = test.filter.filter(t.msg);
+							assert.deepEqual(result, t.expected);
+						});
+					});
 				});
 			});
 		});

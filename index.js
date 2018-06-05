@@ -1,6 +1,7 @@
 "use strict";
 
 const _ = require("lodash");
+const crypto = require("crypto");
 
 const personalDataProperties = ["email", "useremail", "user", "username", "userid", "accountid", "account", "password", "pass", "pwd", "ip", "ipaddress"];
 
@@ -21,11 +22,12 @@ class PersonalDataFilter {
 		this._setRegularExpressions(config);
 		this._setMask(config);
 		this._setPersonalDataProperties(config);
+		this._setMatchReplacer(config);
 	}
 
 	filter(data) {
 		if (_.isString(data)) {
-			return data.replace(this._filterRegExp, this._mask);
+			return this._filterString(data);
 		} else if (_.isArray(data)) {
 			return _.map(data, v => this.filter(v));
 		} else if (_.isObject(data)) { // isObject check should always be after the isArray check because isObject returns true for [].
@@ -45,6 +47,14 @@ class PersonalDataFilter {
 
 			return result;
 		}, {});
+	}
+
+	_filterString(input) {
+		if (this._matchReplacer) {
+			return input.replace(this._filterRegExp, this._matchReplacer);
+		}
+
+		return input.replace(this._filterRegExp, this._mask)
 	}
 
 	_setRegularExpressions(config) {
@@ -89,6 +99,22 @@ class PersonalDataFilter {
 		}
 
 		this._personalDataProperties = props;
+	}
+
+	_setMatchReplacer(config) {
+		if (config.useDefaultMatchReplacer) {
+			if (config.matchReplacer) {
+				throw new Error("You can't use the default match replacer and a cutom one.");
+			}
+
+			this._matchReplacer = (match) => {
+				return crypto.createHash("sha256").update(match).digest("hex");
+			};
+		}
+
+		if (config.matchReplacer) {
+			this._matchReplacer = config.matchReplacer;
+		}
 	}
 }
 

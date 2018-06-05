@@ -31,7 +31,7 @@ declare module PersonalDataFilter {
 		personalDataProperties?: string[];
 
 		/**
-		 * Sets if the filter should use the default match replacer to replace each regular
+		 * Defines if the filter should use the default match replacer to replace each regular
 		 * expression match.
 		 */
 		useDefaultMatchReplacer?: boolean;

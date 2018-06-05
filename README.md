@@ -81,3 +81,22 @@ const cfg = {
 
 const f = pdf.newFilter(cfg);
 ```
+- Match replacers:
+```JavaScript
+const pdf = require("node-personal-data-filter");
+
+const cfg = {
+	useDefaultMatchReplacer: true // Use the default match replacer - sha256 sum.
+};
+
+const f = pdf.newFilter(cfg);
+```
+```JavaScript
+const pdf = require("node-personal-data-filter");
+
+const cfg = {
+	matchReplacer: match => `not a secret - ${match}` // Set custom match replacer.
+};
+
+const f = pdf.newFilter(cfg);
+```

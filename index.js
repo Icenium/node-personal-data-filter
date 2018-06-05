@@ -102,11 +102,11 @@ class PersonalDataFilter {
 	}
 
 	_setMatchReplacer(config) {
-		if (config.useDefaultMatchReplacer && config.matchReplacer) {
-			throw new Error("You can't use the default match replacer and a cutom one.");
-		}
-
 		if (config.useDefaultMatchReplacer) {
+			if (config.matchReplacer) {
+				throw new Error("You can't use the default match replacer and a cutom one.");
+			}
+
 			this._matchReplacer = (match) => {
 				return crypto.createHash("sha256").update(match).digest("hex");
 			};

@@ -29,7 +29,24 @@ declare module PersonalDataFilter {
 		 * Personal data properties which will be used instead of the default ones.
 		 */
 		personalDataProperties?: string[];
+
+		/**
+		 * Sets if the filter should use the default match replacer to replace each regular
+		 * expression match.
+		 */
+		useDefaultMatchReplacer?: boolean;
+
+		/**
+		 * Sets the match replacer which will be used to replace each regular
+		 * expression match.
+		 */
+		matchReplacer: MatchReplacer;
 	}
+
+	/**
+	 * Function which will be used to replace each regular expression match.
+	 */
+	type MatchReplacer = (match: string) => string
 }
 
 declare module "node-personal-data-filter" {

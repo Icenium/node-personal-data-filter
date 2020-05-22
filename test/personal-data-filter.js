@@ -145,5 +145,25 @@ describe("PersonalDataFilter", () => {
 				assert.deepEqual(result, expected);
 			});
 		});
+
+		describe("objects", () => {
+			it("should handle circular references.", () => {
+				const nestedObject = { userEmail: email, filterMe: email, dontFilterMe: notPersonalData, filterMeToo: guid };
+				nestedObject.circular = nestedObject;
+				const data = [email, nestedObject];
+
+				const result = personalDataFilter.filter(data);
+
+				const expected = [expectedMaskedOutput, {
+					userEmail: expectedMaskedOutput,
+					filterMe: expectedMaskedOutput,
+					dontFilterMe: notPersonalData,
+					filterMeToo: expectedMaskedOutput,
+					circular: expectedMaskedOutput,
+				}];
+
+				assert.deepEqual(result, expected);
+			});
+		});
 	});
 });

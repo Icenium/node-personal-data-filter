@@ -26,23 +26,36 @@ class PersonalDataFilter {
 	}
 
 	filter(data) {
+		const result = this._filterRecursively(data, []);
+
+		return result;
+	}
+
+	_filterRecursively(data, referencesCache) {
 		if (_.isString(data)) {
 			return this._filterString(data);
 		} else if (_.isArray(data)) {
-			return _.map(data, v => this.filter(v));
+			return _.map(data, v => this._filterRecursively(v, referencesCache));
 		} else if (_.isObject(data)) { // isObject check should always be after the isArray check because isObject returns true for [].
-			return this._maskPersonalDataProperties(data);
+			// if the current reference has already been traversed this means we've reaced a circular reference
+			// simply mask it in order to avoid maximum callstack due to endless traversal
+			if (_.find(referencesCache, (obj) => obj === data)) {
+				return this._mask;
+			} else {
+				referencesCache.push(data)
+				return this._maskPersonalDataProperties(data, referencesCache);
+			}
 		}
 
 		return data;
 	}
 
-	_maskPersonalDataProperties(data) {
+	_maskPersonalDataProperties(data, referencesCache) {
 		return _.reduce(data, (result, v, k) => {
-			if (this._personalDataProperties.indexOf(k.toLowerCase()) >= 0) {
+			if (this._personalDataProperties.indexOf(k.toString().toLowerCase()) >= 0) {
 				result[k] = this._mask;
 			} else {
-				result[k] = this.filter(v);
+				result[k] = this._filterRecursively(v, referencesCache);
 			}
 
 			return result;

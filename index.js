@@ -27,6 +27,7 @@ class PersonalDataFilter {
 
 	filter(data) {
 		const result = this._filterRecursively(data, []);
+
 		return result;
 	}
 

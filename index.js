@@ -51,11 +51,16 @@ class PersonalDataFilter {
 	}
 
 	_maskPersonalDataProperties(data, referencesCache) {
-		return _.reduce(data, (result, v, k) => {
-			if (this._personalDataProperties.indexOf(k.toString().toLowerCase()) >= 0) {
-				result[k] = this._mask;
+		// It's important to use getOwnPropertyNames here
+		// because if someone were to pass something with non-enumerable properties (e.g. an instance of the Error class)
+		// then a simple _.reduce would simply skip over the non-enumerable properties ultimately removing them from the result
+		const propertyNames = Object.getOwnPropertyNames(data);
+		return _.reduce(propertyNames, (result, key) => {
+			const value = data[key];
+			if (this._personalDataProperties.indexOf(key.toString().toLowerCase()) >= 0) {
+				result[key] = this._mask;
 			} else {
-				result[k] = this._filterRecursively(v, referencesCache);
+				result[key] = this._filterRecursively(value, referencesCache);
 			}
 
 			return result;

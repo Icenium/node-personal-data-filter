@@ -146,6 +146,26 @@ describe("PersonalDataFilter", () => {
 			});
 		});
 
+		describe("errors", () => {
+			it("should handle errors.", () => {
+				const test = new Error('some message');
+
+				const result = personalDataFilter.filter(test);
+
+				assert.deepEqual(result.message, test.message);
+				assert.deepEqual(result.stack, test.stack);
+			});
+
+			it("should filter errors.", () => {
+				const test = new Error(`some message with personal data ${email}`);
+
+				const result = personalDataFilter.filter(test);
+
+				assert.deepEqual(result.message, result.message.replace(email, expectedMaskedOutput));
+				assert.deepEqual(result.stack, result.stack.replace(email, expectedMaskedOutput));
+			});
+		});
+
 		describe("objects", () => {
 			it("should handle circular references.", () => {
 				const nestedObject = { userEmail: email, filterMe: email, dontFilterMe: notPersonalData, filterMeToo: guid };

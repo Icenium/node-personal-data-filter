@@ -56,7 +56,15 @@ class PersonalDataFilter {
 		// then a simple _.reduce would simply skip over the non-enumerable properties ultimately removing them from the result
 		const propertyNames = Object.getOwnPropertyNames(data);
 		return _.reduce(propertyNames, (result, key) => {
-			const value = data[key];
+			let value;
+
+			try {
+				value = data[key];
+			} catch (err) {
+				// We can't get the value and we should not include it in the result because we can't filter it.
+				return result;
+			}
+
 			if (this._personalDataProperties.indexOf(key.toString().toLowerCase()) >= 0) {
 				result[key] = this._mask;
 			} else {

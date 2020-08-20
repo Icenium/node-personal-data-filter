@@ -18,7 +18,7 @@ describe("PersonalDataFilter", () => {
 		const emailMixedCasePropertyName = "eMaIl";
 
 		describe("properties", () => {
-			const personalDataProperties = ["email", "useremail", "user", "username", "userid", "accountid", "account", "password", "pass", "pwd", "ip", "ipaddress"];
+			const personalDataProperties = ["Authorization", "email", "useremail", "user", "username", "userid", "accountid", "account", "password", "pass", "pwd", "ip", "ipaddress"];
 
 			personalDataProperties.forEach(p => {
 				it(`should filter ${p} on first level`, () => {

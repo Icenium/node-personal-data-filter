@@ -13,6 +13,7 @@ describe("PersonalDataFilter", () => {
         const guid = "1fec999a-7e81-4bce-8b32-1b6ddd144f1b";
         const ipV4 = "169.254.139.119";
         const ipV6 = "fe80::f991:38d8:27e6:8b77";
+        const jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTS3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4LTE0NTA0NzExNDciLCJpc3MiOiJTS3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4Iiwic3ViIjoiQUN4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eCIsIm5iZiI6MTQ1MDQ3MTE0NywiZXhwIjoxNDUwNDc0NzQ3LCJncmFudHMiOnsiaWRlbnRpdHkiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaXBfbWVzc2FnaW5nIjp7InNlcnZpY2Vfc2lkIjoiSVN4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eCIsImVuZHBvaW50X2lkIjoiSGlwRmxvd1NsYWNrRG9ja1JDOnVzZXJAZXhhbXBsZS5jb206c29tZWlvc2RldmljZSJ9fX0.IHx8KeH1acIfwnd8EIin3QBGPbfnF-yVnSFp5NpQJi0";
         const notPersonalData = "not-personal-data";
         const secondPropertyName = "second";
         const emailMixedCasePropertyName = "eMaIl";
@@ -116,7 +117,8 @@ describe("PersonalDataFilter", () => {
                         { msg: ipV4, expected: test.expectedTextTransformer(ipV4) },
                         { msg: `text${ipV4}text`, expected: `text${test.expectedTextTransformer(ipV4)}text` },
                         { msg: ipV6, expected: test.expectedTextTransformer(ipV6) },
-                        { msg: `text${ipV6}text`, expected: `text${test.expectedTextTransformer(ipV6)}text` }
+                        { msg: `text${ipV6}text`, expected: `text${test.expectedTextTransformer(ipV6)}text` },
+                        { msg: jwt, expected: test.expectedTextTransformer(jwt) }
                     ];
 
                     testCaces.forEach(t => {

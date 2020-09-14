@@ -104,6 +104,7 @@ describe("PersonalDataFilter", () => {
                 describe(test.title, () => {
                     const testCaces = [
                         { msg: email, expected: test.expectedTextTransformer(email) },
+                        { msg: `/v1/${email}/something`, expected: `/v1/${test.expectedTextTransformer(email)}/something` },
                         { msg: `text ${email} text`, expected: `text ${test.expectedTextTransformer(email)} text` },
                         { msg: `text ${email} ${email} text`, expected: `text ${test.expectedTextTransformer(email)} ${test.expectedTextTransformer(email)} text` },
                         { msg: guid, expected: test.expectedTextTransformer(guid) },

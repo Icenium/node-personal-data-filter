@@ -42,7 +42,7 @@ class PersonalDataFilter {
     }
 
     filter(data) {
-        const result = this._filterRecursively(data, []);
+        const result = this._filterRecursively(data, new Set());
 
         return result;
     }
@@ -55,10 +55,10 @@ class PersonalDataFilter {
         } else if (_.isObject(data)) { // isObject check should always be after the isArray check because isObject returns true for [].
             // if the current reference has already been traversed this means we've reaced a circular reference
             // simply mask it in order to avoid maximum callstack due to endless traversal
-            if (_.find(referencesCache, (obj) => obj === data)) {
+            if (referencesCache.has(data)) {
                 return this._mask;
             } else {
-                referencesCache.push(data)
+                referencesCache.add(data)
                 return this._maskPersonalDataProperties(data, referencesCache);
             }
         }
